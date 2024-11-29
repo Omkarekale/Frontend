@@ -22,7 +22,9 @@ const Login = () => {
       try {
         const res = await axios.post(`${USER_API_END_POINT}/login`, { email, password }, {
           headers: {
-            'Content-Type': "application/json"
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+            // 'Content-Type': "application/json"
           },
           withCredentials: true
         });
