@@ -11,6 +11,10 @@ const useGetMyTweets = (id) => {
     // Memoize fetchMyTweets using useCallback
     const fetchMyTweets = useCallback(async () => {
         try {
+            if (!id) {
+                console.error("Error: User ID is undefined");
+                return;
+            }
             const { data } = await axios.get(`${TWEET_API_END_POINT}/alltweets/${id}`, {
                 withCredentials: true
             });
