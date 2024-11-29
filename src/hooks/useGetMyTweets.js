@@ -1,42 +1,49 @@
 import axios from "axios";
 import { TWEET_API_END_POINT } from "../utils/constant";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllTweets } from "../redux/tweetSlice";
 
 const useGetMyTweets = (id) => {
     const dispatch = useDispatch();
     const { refresh, isActive } = useSelector(store => store.tweet);
-    
 
-    const fetchMyTweets = async () => {
+    // Memoize fetchMyTweets using useCallback
+    const fetchMyTweets = useCallback(async () => {
         try {
-            const res = await axios.get(`${TWEET_API_END_POINT}/alltweets/${id}`, {
+            const { data } = await axios.get(`${TWEET_API_END_POINT}/alltweets/${id}`, {
                 withCredentials: true
             });
-            console.log(res);
-            dispatch(getAllTweets(res.data.tweets));
+            if (data.tweets) {
+                dispatch(getAllTweets(data.tweets));
+            }
         } catch (error) {
-            console.log(error);
+            console.error("Error fetching my tweets:", error);
         }
-    }
-    const followingTweetHandler = async () => { 
+    }, [id, dispatch]);  // `id` and `dispatch` are the dependencies
+
+    // Memoize followingTweetHandler using useCallback
+    const followingTweetHandler = useCallback(async () => {
         try {
-            axios.defaults.withCredentials = true;
-            const res = await axios.get(`${TWEET_API_END_POINT}/followingtweets/${id}`);
-            console.log(res);
-            dispatch(getAllTweets(res.data.tweets));
+            const { data } = await axios.get(`${TWEET_API_END_POINT}/followingtweets/${id}`, {
+                withCredentials: true
+            });
+            if (data.tweets) {
+                dispatch(getAllTweets(data.tweets));
+            }
         } catch (error) {
-            console.log(error);
+            console.error("Error fetching following tweets:", error);
         }
-    }
+    }, [id, dispatch]);  // `id` and `dispatch` are the dependencies
 
     useEffect(() => {
-        if(isActive){
+        // Ensure the correct API is called based on the `isActive` flag
+        if (isActive) {
             fetchMyTweets();
-        }else{
+        } else {
             followingTweetHandler();
         }
-    }, [isActive,refresh]);
+    }, [id, isActive, refresh, fetchMyTweets, followingTweetHandler]);  // Include memoized functions in dependency array
 };
+
 export default useGetMyTweets;
