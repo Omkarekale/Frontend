@@ -4,11 +4,18 @@ export const TWEET_API_END_POINT = "https://backen-axw9.onrender.com/api/v1/twee
 // export const TWEET_API_END_POINT = "http://localhost:8000/api/v1/tweet";
 
 
-export const timeSince = (timestamp) => {
+
+export const timeSince = (timestamp, suffix = 'ago') => {
     let time = Date.parse(timestamp);
+    if (isNaN(time)) {
+        return "Invalid date";
+    }
+
     let now = Date.now();
     let secondsPast = (now - time) / 1000;
-    let suffix = 'ago';
+    if (secondsPast < 1) {
+        return "Just now";
+    }
 
     let intervals = {
         year: 31536000,
@@ -24,7 +31,32 @@ export const timeSince = (timestamp) => {
         let interval = intervals[i];
         if (secondsPast >= interval) {
             let count = Math.floor(secondsPast / interval);
-            return `${count} ${i} ${count > 1 ? 's' : ''} ${suffix}`;
+            return `${count} ${i}${count > 1 ? 's' : ''} ${suffix}`;
         }
     }
-}
+};
+
+// export const timeSince = (timestamp) => {
+//     let time = Date.parse(timestamp);
+//     let now = Date.now();
+//     let secondsPast = (now - time) / 1000;
+//     let suffix = 'ago';
+
+//     let intervals = {
+//         year: 31536000,
+//         month: 2592000,
+//         week: 604800,
+//         day: 86400,
+//         hour: 3600,
+//         minute: 60,
+//         second: 1
+//     };
+
+//     for (let i in intervals) {
+//         let interval = intervals[i];
+//         if (secondsPast >= interval) {
+//             let count = Math.floor(secondsPast / interval);
+//             return `${count} ${i} ${count > 1 ? 's' : ''} ${suffix}`;
+//         }
+//     }
+// }
